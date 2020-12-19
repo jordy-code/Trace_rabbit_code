@@ -1,0 +1,156 @@
+# -*- coding: utf-8 -*-
+
+import numpy as np
+
+
+class Trace:
+    
+    '''
+    Initializes the variables and imports the matrix. There is a default array, but any array
+    can be used while initializing the Trace program, entring the matrix as a first argument. 
+    '''
+    def __init__(self, matrix=[[1,5,3,2,5],[5,4,1,7,9],[5,4,3,18,9],[5,2,5,8,6],[3,9,7,7,5]]):
+        self.matrix=matrix
+        self.root=np.array(self.matrix)
+        
+    '''
+    The start function will find the cell with the largest number of carrots. If there is a mmidle cell,
+    the largest number of the cell will be the starting point. If there are two middle cells, the largest number bwteen 
+    both cells will be the starting point.
+    '''
+    def start(self):
+        # Get the dimensions of the array size
+        dimensions=self.root.shape
+        # Check whether or not the array has a central cell by checking for a whole number
+        x=(dimensions[0])/2 ; y=(dimensions[1])/2
+        
+        '''
+        If there is not a single middle cell, both middle cells will be used finding the largest number. The midpoint 
+        is used in conjucnton with the index value of the largest number to get the inital starting point in the array.
+        '''
+        if x.is_integer():
+            # Get the two middle index coordinates for two middle cells
+            x_plus=int(1+ x + 0.5)
+            x_minus=int(x- 0.5)
+            
+            # Get the number coordinating to half the number of arrays to calculate index number of the largest integer 
+            midpoint=(dimensions[0]/2)-1
+            # Retrieve the two middle cells
+            reduced=(self.root[x_minus: x_plus])
+            
+            # Retrieve the index of the largest integer between both arrays
+            r, v=np.unravel_index(reduced.argmax(), reduced.shape)
+            # Calculate the index number for the array with largest number
+            mid=int(midpoint+r)
+            # Coordinates for the largest middle integer
+            coordinates=[mid, v]
+            return coordinates
+        
+        # if array has does have a central cell, get the index of the largest integer
+        else:
+            # Get the center cell index number
+            centroid=int(y+.05)
+            # Retrieve index of the largest integer
+            r, v=np.unravel_index(self.root.argmax(), self.root.shape)
+            # Coordinates of the largest integer
+            coordinates=[centroid,v]
+            return coordinates
+            
+     # Function to "escape" the garden and eat carrots
+    def Hungry_rabbit(self):
+        '''
+        Create lists for previous locations and keep a track of the cell values. Prior_locations will 
+        keep track of what cells the rabbit has previously been and eaten those carrots. Once the carrots 
+        have been eaten, the cell is updated to a value of zero. The values list will keep track of the 
+        number of carrots the rabbiit has eaten
+        '''
+        prior_locations=[]
+        values=[]
+        
+        # Retrive the starting position of the rabbit and add this location to prior_locations
+        location=self.start()
+        x=location[0] ; y=location[1]
+        prior_locations.append((x,y))
+        
+        # Get the number of carrots in the initial cell and add that number to the values list
+        initial_value=self.root[location[0], location[1]]
+        values.append(initial_value)
+        
+        '''
+        This loop will keep track of how many cells the rabbit is eating in the curent cell. As
+        long as the cell contains at least 1 carrot, the loop will continue to the next cell. When 
+        the rabbit no longer has any available cells or the cell has no carrots, the rabbit (function)
+        will go to sleep
+        '''
+        while values[-1] != 0:
+            
+            # Get the current location of the rabbit in the array
+            x=location[0] ; y=location[1]
+            # Assigning coordinates to all possible locations the rabbit could travel to next
+            down=(x + 1, y) ; up=(abs(x - 1), y) ; left=(x, abs(y - 1)) ; right=(x, y + 1)
+            
+            # Add each possible new location to a new array
+            new_array=[down, up, right, left]
+            
+            # Remove any adjacent locations if the rabbit has previouosly already visited that location 
+            new_locations=[x for x in new_array if x not in prior_locations]
+
+            # Create new lists that can be updated with new locations the rabbit has not yet visited
+            available_locations=[]
+            possible_values=[]
+            
+            '''
+            Loop through all possible locations the rabiit may visit and add the number of carrots to 
+            the possible_values list. The try-except loop will catch if any possible coordinate are outside
+            the array bounderies and only update the lists with cells within the array that the rabbit is 
+            able to visit.
+            '''
+            for i in new_locations:
+                try:
+                    possible_values.append(self.root[i])
+                    available_locations.append(i)
+                except:
+                    pass
+            
+            ''' 
+            This block will check the list of possible locations and number of carrots in those locations. As long
+            as there are at least 1 carrot adjecent to where the rabbit is currently located, the block will continue 
+            and the rabbit will continue moving throught the cells until there are no carrots left adjecent to the 
+            rabbit's current location.
+            '''
+            if sum(possible_values) >=1:
+                # Get the index of the largest number in the array
+                largest=possible_values.index(max(possible_values))
+                # Get the coordinates of the cell with the most amount of carrots
+                cell=(((available_locations[largest])))
+                # Retrive the number of carrots in this cell and add it to the values list (# of carrots eaten)
+                values.append(self.root[cell])
+                
+                '''
+                Once the number of carrots is added to the values list, the number in the cell is converted to zero as there
+                are no carrots left once eaten. The location of where the rabbit has just eaten these carrots is added prior_locations
+                and the location variable is updated with the cell where the rabbit currently is.
+                '''
+                index=(list(available_locations[largest]))
+                self.root[x, y]= 0
+                
+                # Update the rabbit's current location
+                location=index
+                prior_locations.append(cell)
+                
+            # If there are no adject cells left for the rabbit to move to, a value of zero carrots is added to the values list to exit the block 
+            else:
+                values.append(0)
+                print('Rabbit is sleeping')
+         
+        # Once the rabbit has eaten all the carrots throughout the array, the total number of carrots is calculated
+        carrots=sum(values)
+        print('Rabbit ate', carrots, 'carrots before going to sleep')
+        return carrots
+
+'''
+Call the Trace function. Any array can be input as a first argument into Trace() and the array will superseed the
+default array for the analysis and output result
+'''
+Rabbit=Trace()
+Rabbit.Hungry_rabbit()
