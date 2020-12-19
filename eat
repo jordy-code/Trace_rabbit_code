@@ -1,0 +1,74 @@
+import pandas as pd
+import numpy as np
+
+
+class Trace:
+    
+    # Initialize parameters and array
+    # Function contains a default matrix but any matrix can be used when calling the function
+    def __init__(self, matrix=[[1,5,3,2,5],[5,4,1,7,9],[5,4,3,18,9],[5,2,5,8,6],[3,9,7,7,5]]):
+        print("initializing")
+        self.matrix=matrix
+        self.root=np.array(self.matrix)
+        
+    def start(self):
+        # create empty list 
+        root_numbers=[]
+        # Get the dimensions of array size
+        dimensions=self.root.shape
+        # Check whether or not the array has a central cell
+        x=(dimensions[0])/2 ; y=(dimensions[1])/2
+        
+        # if array does not have a centeal cell, get the middle two cells to compare
+        if x.is_integer():
+            x_plus=int(1+x+ 0.5)
+            x_minus=int(x- 0.5)
+            
+            # retrieve center point
+            reduced=(self.root[x_minus: x_plus])
+            # Retrieve the index of the largest integer in both arrays
+            r, v=np.unravel_index(reduced.argmax(), reduced.shape)
+            coordinates=[x_minus, v]
+            return coordinates
+        
+        # if array has does have a central cell, get the index of the largest integer
+        else:
+            # Get the center cell index number
+            centroid=int(y+.05)
+            root_numbers.append(x)
+            # Retrive center cell
+            center=self.root[centroid]
+            # Retrieve index of the largest integer
+            r, v=np.unravel_index(self.root.argmax(), self.root.shape)
+            coordinates=[centroid,v]
+            return coordinates
+            
+     # Function to "escape" the garden  
+    def eat(self, cells=10):
+        # set limit to add to the number of possible cells
+        limit=0
+        # Call start function to get the centeal max point in the matrix
+        location=self.start()
+        while (limit<cells):
+            limit= limit +1
+            x=location[0] ; y=location[1]
+            try:
+                """ I would included a series of max integer checks for the largest adjecent number in the matrix. The new matrix corrdinates would 
+                be updated and which direction the rabbit just came from would be stored to prevent the rabbit from returning to the cell where it 
+                had just come from. Once there were now more cells available with an integer greater than 0, including leaving the previous cell out, the 
+                function would end with the except clause. 
+               """
+                
+                down=self.root[x + limit, y] ; up=self.root[x - limit,y] ; right=self.root[x, y + limit] ; left=self.root[x, y-limit]
+                x =x+ limit ; y =y+ limit
+               
+            except:
+                print('rabbit sleeping')
+                    
+            
+            
+        
+
+
+program=Trace()
+program.eat()
