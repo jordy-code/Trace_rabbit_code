@@ -47,7 +47,7 @@ class Trace:
     def eat(self, cells=10):
         # set limit to add to the number of possible cells
         limit=0
-        # Call start function to get the centeal max point in the matrix
+        # Call start function to get the central max point in the matrix
         location=self.start()
         while (limit<cells):
             limit= limit +1
@@ -60,7 +60,6 @@ class Trace:
                """
                 
                 down=self.root[x + limit, y] ; up=self.root[x - limit,y] ; right=self.root[x, y + limit] ; left=self.root[x, y-limit]
-                x =x+ limit ; y =y+ limit
                
             except:
                 print('rabbit sleeping')
